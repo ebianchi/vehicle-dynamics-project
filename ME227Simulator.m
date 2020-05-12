@@ -31,7 +31,7 @@ gains.K_lat_p_PID = 0.08;       % []
 gains.K_lat_i_PID = 0.00003;    % []
 gains.K_lat_d_PID = 60;         % []
 
-% Calculate understeer gradient (bibit added)
+% Calculate understeer gradient (bibit added for lookahead controller)
 veh.K = (veh.Wf / f_tire.Ca_lin - veh.Wr / r_tire.Ca_lin) / g;
 
 % Select controller
