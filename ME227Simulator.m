@@ -25,32 +25,35 @@ gains.x_la = 15;                % [m]
 gains.K_long = veh.m*0.1*g;     % [N/m]
 
 % Set control gains -- PID controller
-gains.K_long_p_PID = 0;
-gains.K_long_i_PID = 0;
-gains.K_long_d_PID = 0;
-gains.K_lat_p_PID = 0;
-gains.K_lat_i_PID = 0;
-gains.K_lat_d_PID = 0;
+gains.K_long_p_PID = 5000;      % [] TODO:  fill in these units,
+gains.K_long_i_PID = 3;         % []        and tune better
+gains.K_long_d_PID = 1;         % []
+gains.K_lat_p_PID = 0.08;       % []
+gains.K_lat_i_PID = 0.00003;    % []
+gains.K_lat_d_PID = 60;         % []
 
 % Calculate understeer gradient (bibit added)
 veh.K = (veh.Wf / f_tire.Ca_lin - veh.Wr / r_tire.Ca_lin) / g;
 
-% Select lookahead controller mode
-% control_mode = 1; % Feedback only
-% control_mode = 2; % Feedforward + Feedback
+% Select controller
+control_mode = 1;  % 1 - lookahead controller
+                   % 2 - PID controller
 
-% Select path (Uncomment one of these paths and comment the others)
-% straight  path
-% s = [0     150];
-% k = [0     0];
-
-% constant radius  path
-% s = [0      150];
-% k = [1/40   1/40];
-
-% "undulating" path
-s = [0      20      40   150];
-k = [1/20   -1/20   0    0];
+% Select path
+path_mode = 1;     % 1 - straight path
+                   % 2 - constant radius path
+                   % 3 - undulating path
+                   
+if path_mode == 1      % straight  path
+    s = [0     150];
+    k = [0     0];
+elseif path_mode == 2  % constant radius  path
+    s = [0      150];
+    k = [1/40   1/40];
+elseif path_mode == 3  % "undulating" path
+    s = [0      20      40   150];
+    k = [1/20   -1/20   0    0];
+end
 %%% END STUDENT CODE
 
 %--------------------------------------------------------------------------
@@ -91,7 +94,7 @@ s_(1) = 0;
 e_(1) = 1;
 dpsi_(1) = 0;
 r_(1) = 0;
-Ux_(1) = 15;
+Ux_(1) = 12;
 Uy_(1) = 0;
 %%% END STUDENT CODE
 
@@ -105,10 +108,28 @@ for i = 1:lenT-1
     kappa = interp1(path.s, path.k, s_(i));
     
     %%% STUDENT CODE HERE
-    % Calculate actuator commands    
-    [delta_(i), Fx_(i)] = look_ahead_controller(Ux_(i), e_(i), dpsi_(i), ...
+    % Calculate actuator commands  
+    if control_mode == 1  % lookahead controller
+        [delta_(i), Fx_(i)] = look_ahead_controller(Ux_(i), e_(i), dpsi_(i), ...
                                                 kappa, gains, path, veh, ...
                                                 r_tire, f_tire);
+                                            
+    elseif control_mode == 2  % PID controller
+        if i == 1  % take care of initial integral and derivative terms
+            int_Ux = 0;
+            int_e  = 0;
+            dUx    = 0;
+            de     = 0;
+        else
+            dUx = Ux_(i) - Ux_(i-1);  % no need to also calculate integral 
+            de  = e_(i)  - e_(i-1);   % terms, as those are added with each
+                                      % loop
+        end
+        
+        [delta_(i), Fx_(i), int_Ux, int_e] = PID_controller(Ux_(i), dUx,...
+                                               int_Ux, e_(i), de, int_e,...
+                                               gains, path.UxDes(1));
+    end
     
     % Take simulation step
     [Ux_(i+1), Uy_(i+1), r_(i+1), s_(i+1), e_(i+1), dpsi_(i+1)] = ...
