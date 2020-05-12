@@ -9,14 +9,13 @@ clear; clc; close all
 %--------------------------------------------------------------------------
 %% CONSTANTS AND PARAMS
 %--------------------------------------------------------------------------
-%%% STUDENT CODE HERE
 % Load Niki params
 setup_niki;
 
 % Create time vector (!!Do not change these variable names - store
 % your results in these variables!!)
 dt = 0.001;
-t_ = 0:dt:8;
+t_ = 0:dt:30;
 lenT = length(t_);
 
 % Set control gains -- lookahead controller
@@ -36,35 +35,15 @@ gains.K_lat_d_PID = 60;         % []
 veh.K = (veh.Wf / f_tire.Ca_lin - veh.Wr / r_tire.Ca_lin) / g;
 
 % Select controller
-control_mode = 1;  % 1 - lookahead controller
+control_mode = 2;  % 1 - lookahead controller
                    % 2 - PID controller
 
-% Select path
-path_mode = 1;     % 1 - straight path
-                   % 2 - constant radius path
-                   % 3 - undulating path
-                   
-if path_mode == 1      % straight  path
-    s = [0     150];
-    k = [0     0];
-elseif path_mode == 2  % constant radius  path
-    s = [0      150];
-    k = [1/40   1/40];
-elseif path_mode == 3  % "undulating" path
-    s = [0      20      40   150];
-    k = [1/20   -1/20   0    0];
-end
-%%% END STUDENT CODE
+% Load path and speed profile
+load('path.mat')
 
 %--------------------------------------------------------------------------
 %% GENERATE PATH AND ALLOCATE MEMORY
 %--------------------------------------------------------------------------
-% path information
-init = [0;0;0];
-
-% integrate s and k to get path
-path = integrate_path(s, k, init);
-
 % Allocate space for results (!!Do not change these variable names - store
 % your results in these variables!!)
 s_ = zeros(1,lenT);
@@ -77,26 +56,14 @@ delta_ = zeros(1,lenT);
 Fx_ = zeros(1,lenT);
 
 %--------------------------------------------------------------------------
-%% SET SPEED PROFILE
-%--------------------------------------------------------------------------
-% Set speed profile here (!!Do not change these variable names - store
-% your results in these variables!!)
-
-%%% STUDENT CODE HERE
-path.UxDes = 15*ones(size(path.s));
-%%% END STUDENT CODE
-
-%--------------------------------------------------------------------------
 %% SET INITIAL CONDITIONS
 %--------------------------------------------------------------------------
-%%% STUDENT CODE HERE
 s_(1) = 0;
 e_(1) = 1;
 dpsi_(1) = 0;
 r_(1) = 0;
-Ux_(1) = 12;
+Ux_(1) = 15;
 Uy_(1) = 0;
-%%% END STUDENT CODE
 
 %--------------------------------------------------------------------------
 %% SIMULATION LOOP
@@ -107,11 +74,13 @@ for i = 1:lenT-1
     % look up kappa
     kappa = interp1(path.s, path.k, s_(i));
     
-    %%% STUDENT CODE HERE
+    % look up Ux_des
+    Ux_des = interp1(path.s, path.UxDes, s_(i));
+    
     % Calculate actuator commands  
     if control_mode == 1  % lookahead controller
         [delta_(i), Fx_(i)] = look_ahead_controller(Ux_(i), e_(i), dpsi_(i), ...
-                                                kappa, gains, path, veh, ...
+                                                kappa, gains, Ux_des, veh, ...
                                                 r_tire, f_tire);
                                             
     elseif control_mode == 2  % PID controller
@@ -128,7 +97,7 @@ for i = 1:lenT-1
         
         [delta_(i), Fx_(i), int_Ux, int_e] = PID_controller(Ux_(i), dUx,...
                                                int_Ux, e_(i), de, int_e,...
-                                               gains, path.UxDes(1));
+                                               gains, Ux_des);
     end
     
     % Take simulation step

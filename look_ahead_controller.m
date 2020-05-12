@@ -1,5 +1,5 @@
 function [delta, Fx] = look_ahead_controller(Ux, e, dpsi, kappa, gains, ...
-                                             path, veh, r_tire, f_tire)
+                                             Ux_des, veh, r_tire, f_tire)
 % Calculates steer angle and longitudinal force to apply using a lookahead
 % control scheme.  This is the first of two controllers developed for the
 % project.
@@ -13,11 +13,7 @@ function [delta, Fx] = look_ahead_controller(Ux, e, dpsi, kappa, gains, ...
 
     delta = -gains.K_la * (e + gains.x_la*dpsi)/f_tire.Ca_lin ...
                 + delta_ff;
-    Fx = gains.K_long*(path.UxDes(1) - Ux); % <-- that UxDes(1) might be 
-                                            % sketchy for paths which have 
-                                            % changing desired longitudinal
-                                            % velocities, just realized
-                                            % that, feel free to change to
-                                            % whatever might be right.
+    Fx = gains.K_long*(Ux_des - Ux);
+    
 end
 
