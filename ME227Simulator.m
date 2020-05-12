@@ -19,10 +19,18 @@ dt = 0.001;
 t_ = 0:dt:8;
 lenT = length(t_);
 
-% Set control gains
+% Set control gains -- lookahead controller
 gains.K_la = 3500;              % [N/m]
 gains.x_la = 15;                % [m]
 gains.K_long = veh.m*0.1*g;     % [N/m]
+
+% Set control gains -- PID controller
+gains.K_long_p_PID = 0;
+gains.K_long_i_PID = 0;
+gains.K_long_d_PID = 0;
+gains.K_lat_p_PID = 0;
+gains.K_lat_i_PID = 0;
+gains.K_lat_d_PID = 0;
 
 % Calculate understeer gradient (bibit added)
 veh.K = (veh.Wf / f_tire.Ca_lin - veh.Wr / r_tire.Ca_lin) / g;
