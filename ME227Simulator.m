@@ -97,15 +97,10 @@ for i = 1:lenT-1
     kappa = interp1(path.s, path.k, s_(i));
     
     %%% STUDENT CODE HERE
-
-    % Calculate actuator commands
-    dpsi_ss = kappa*(veh.m*veh.a*Ux_(i)^2 / (veh.L * r_tire.Ca_lin) - veh.b);
-    delta_ff = gains.K_la * gains.x_la * dpsi_ss / f_tire.Ca_lin + ...
-               kappa * (veh.L + veh.K * Ux_(i)^2);
-    
-    delta_(i) = -gains.K_la * (e_(i) + gains.x_la*dpsi_(i))/f_tire.Ca_lin ...
-                + delta_ff;
-    Fx_(i) = gains.K_long*(path.UxDes(1) - Ux_(i));
+    % Calculate actuator commands    
+    [delta_(i), Fx_(i)] = look_ahead_controller(Ux_(i), e_(i), dpsi_(i), ...
+                                                kappa, gains, path, veh, ...
+                                                r_tire, f_tire);
     
     % Take simulation step
     [Ux_(i+1), Uy_(i+1), r_(i+1), s_(i+1), e_(i+1), dpsi_(i+1)] = ...
