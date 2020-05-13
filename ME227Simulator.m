@@ -31,11 +31,8 @@ gains.K_lat_p_PID = 0.08;       % []
 gains.K_lat_i_PID = 0.00003;    % []
 gains.K_lat_d_PID = 60;         % []
 
-% Calculate understeer gradient (bibit added for lookahead controller)
-veh.K = (veh.Wf / f_tire.Ca_lin - veh.Wr / r_tire.Ca_lin) / g;
-
 % Select controller
-control_mode = 2;  % 1 - lookahead controller
+control_mode = 1;  % 1 - lookahead controller
                    % 2 - PID controller
 
 % Load path and speed profile
@@ -78,34 +75,36 @@ for i = 1:lenT-1
     Ux_des = interp1(path.s, path.UxDes, s_(i));
     
     % Calculate actuator commands  
-    if control_mode == 1  % lookahead controller
-        [delta_(i), Fx_(i)] = look_ahead_controller(Ux_(i), e_(i), dpsi_(i), ...
-                                                kappa, gains, Ux_des, veh, ...
-                                                r_tire, f_tire);
-                                            
-    elseif control_mode == 2  % PID controller
-        if i == 1  % take care of initial integral and derivative terms
-            int_Ux = 0;
-            int_e  = 0;
-            dUx    = 0;
-            de     = 0;
-        else
-            dUx = Ux_(i) - Ux_(i-1);  % no need to also calculate integral 
-            de  = e_(i)  - e_(i-1);   % terms, as those are added with each
-                                      % loop
-        end
-        
-        [delta_(i), Fx_(i), int_Ux, int_e] = PID_controller(Ux_(i), dUx,...
-                                               int_Ux, e_(i), de, int_e,...
-                                               gains, Ux_des);
-    end
+    [delta_(i), Fx_(i)] = me227_controller(s_(i), e_(i), dpsi_(i), ...
+                                           Ux_(i), Uy_(i), r_(i), gains,...
+                                           control_mode, path);
+%     if control_mode == 1  % lookahead controller
+%         [delta_(i), Fx_(i)] = look_ahead_controller(Ux_(i), e_(i), dpsi_(i), ...
+%                                                 kappa, gains, Ux_des, veh, ...
+%                                                 r_tire, f_tire);
+%                                             
+%     elseif control_mode == 2  % PID controller
+%         if i == 1  % take care of initial integral and derivative terms
+%             int_Ux = 0;
+%             int_e  = 0;
+%             dUx    = 0;
+%             de     = 0;
+%         else
+%             dUx = Ux_(i) - Ux_(i-1);  % no need to also calculate integral 
+%             de  = e_(i)  - e_(i-1);   % terms, as those are added with each
+%                                       % loop
+%         end
+%         
+%         [delta_(i), Fx_(i), int_Ux, int_e] = PID_controller(Ux_(i), dUx,...
+%                                                int_Ux, e_(i), de, int_e,...
+%                                                gains, Ux_des);
+%     end
     
     % Take simulation step
     [Ux_(i+1), Uy_(i+1), r_(i+1), s_(i+1), e_(i+1), dpsi_(i+1)] = ...
     simulate_step(Ux_(i), Uy_(i), r_(i), s_(i), e_(i), dpsi_(i), ...
                   delta_(i), Fx_(i), kappa, dt, veh, f_tire, r_tire);
-    
-    %%% END STUDENT CODE
+              
 end
 
 %--------------------------------------------------------------------------

@@ -1,4 +1,5 @@
-function [ delta, Fx ] = me227_controller( s, e, dpsi, Ux, Uy, r, gains, control_mode, path)
+function [ delta, Fx ] = me227_controller(s, e, dpsi, Ux, Uy, r, gains, ...
+                                          control_mode, path)
 %ME227 Controller:
 % Spring 2019
 % Prof. Chris Gerdes & CAs Nathan Spielberg, John Alsterda
@@ -7,7 +8,7 @@ function [ delta, Fx ] = me227_controller( s, e, dpsi, Ux, Uy, r, gains, control
 % vehicle. These will be delta and Fx and will be determined based upon
 % your control laws below. 
 %
-% For the project you wil use this same input output structure and in this
+% For the project you will use this same input output structure and in this
 % homework you will use this control structure for defining the control
 % inputs in your simulation.
 
@@ -45,10 +46,8 @@ r_tire.mu     = 0.94;
 %--------------------------------------------------------------------------
 %% Understeer Gradient
 %--------------------------------------------------------------------------
-%%% STUDENT CODE HERE
 % Calculate the understeer gradient for Niki
-K_radpmps2 = ??; % [rad/m/s^2]
-%%% END STUDENT CODE
+K_radpmps2 = (veh.Wf / f_tire.Ca_lin - veh.Wr / r_tire.Ca_lin) / g;
 
 %--------------------------------------------------------------------------
 %% Control Parameters
@@ -72,25 +71,25 @@ kappa = interp1(path.s, path.k, s);
 %--------------------------------------------------------------------------
 %% Lateral Control Law
 %--------------------------------------------------------------------------
-%%% STUDENT CODE HERE
-%Use the Lateral Control Law to Caclulate Delta
-if control_mode == 1
-    %%% STUDENT CODE HERE
-    % Feedback only
+if control_mode == 1  % lookahead controller
+    dpsi_ss  = kappa*(veh.m*veh.a*Ux^2 / (veh.L * r_tire.Ca_lin) - veh.b);
+    delta_ff = K_la * x_la * dpsi_ss / f_tire.Ca_lin + kappa * (veh.L + ...
+               K_radpmps2 * Ux^2);
 
-    %%% END STUDENT CODE
-else
-    %%% STUDENT CODE HERE
-    % Feedback + feedforward
+    delta = -K_la * (e + x_la*dpsi)/f_tire.Ca_lin + delta_ff;
+    
+else  % custom controller
 
-    %%% END STUDENT CODE
 end
 
 %--------------------------------------------------------------------------
 %% Longitudinal Control Law
 %--------------------------------------------------------------------------
-%%% STUDENT CODE HERE
-%Use the Longitudinal Control Law to Cacluate Fx
+if control_mode == 1  % lookahead controller
+    Fx = K_long*(Ux_des - Ux);
+    
+else  % custom controller
+    
+end
 
-%%% END STUDENT CODE
 end
