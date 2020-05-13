@@ -69,9 +69,6 @@ K_la = gains.K_la;
 x_la = gains.x_la;
 K_long = gains.K_long;
 
-K_long_p = gains.K_long_p_PID;
-K_long_i = gains.K_long_i_PID;
-K_long_d = gains.K_long_d_PID;
 K_lat_p  = gains.K_lat_p_PID;
 K_lat_i  = gains.K_lat_i_PID;
 K_lat_d  = gains.K_lat_d_PID;
@@ -116,25 +113,6 @@ end
 %% Longitudinal Control Law
 %--------------------------------------------------------------------------
 Ux_error = Ux_des - Ux;
-
-if control_mode == 1  % lookahead controller
-    Fx = K_long*Ux_error;
-    
-else  % custom controller
-    if isempty(int_Ux)             % update integral term
-        int_Ux = Ux_error;
-    else
-        int_Ux = int_Ux + Ux_error;
-    end
-    
-    dUx_error = 0;                 % calculate derivative term
-                                   % TODO:  ADD IN HERE
-    
-    long_i = K_long_i * int_Ux;    % calculate integral contribution
-    long_p = K_long_p * Ux_error;  % calculate proportional contribution
-    long_d = K_long_d * dUx_error; % calculate derivative contribution
-    Fx = long_p + long_i + long_d; % get control for Fx
-    
-end
+Fx = K_long*Ux_error;
 
 end

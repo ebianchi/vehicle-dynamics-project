@@ -4,7 +4,7 @@
 % ME227 Spr 2020
 % Nonlinear Vehicle Simulation
 
-clear; clc; close all
+clear all; clc; close all
 
 %--------------------------------------------------------------------------
 %% CONSTANTS AND PARAMS
@@ -24,15 +24,12 @@ gains.x_la = 15;                % [m]
 gains.K_long = veh.m*0.1*g;     % [N/m]
 
 % Set control gains -- PID controller
-gains.K_long_p_PID = 5000;      % [] TODO:  fill in these units,
-gains.K_long_i_PID = 3;         % []        and tune better
-gains.K_long_d_PID = 1;         % []
-gains.K_lat_p_PID = 0.08;       % []
-gains.K_lat_i_PID = 0.00003;    % []
-gains.K_lat_d_PID = 60;         % []
+gains.K_lat_p_PID = 0.1;           % [] TODO:  Fill in units here and tune
+gains.K_lat_i_PID = 0.001;    % []        more thoughtfully
+gains.K_lat_d_PID = 7;         % []
 
 % Select controller
-control_mode = 1;  % 1 - lookahead controller
+control_mode = 2;  % 1 - lookahead controller
                    % 2 - PID controller
 
 % Load path and speed profile
