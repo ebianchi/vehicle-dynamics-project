@@ -112,7 +112,11 @@ end
 %--------------------------------------------------------------------------
 %% Longitudinal Control Law
 %--------------------------------------------------------------------------
+a_des = interp1(path.s, path.axDes, s);
+rho_air = 1.225;
+Frr = veh.m * g * .015;
+Fd = .594 * rho_air * Ux^2 / 2;
 Ux_error = Ux_des - Ux;
-Fx = K_long*Ux_error;
+Fx = K_long * Ux_error + veh.m*a_des + Frr + Fd;
 
 end

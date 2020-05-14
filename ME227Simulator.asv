@@ -75,7 +75,7 @@ for i = 1:lenT-1
     [delta_(i), Fx_(i)] = me227_controller(s_(i), e_(i), dpsi_(i), ...
                                            Ux_(i), Uy_(i), r_(i), gains,...
                                            control_mode, path);
-
+    Fx_
 %     if control_mode == 1  % lookahead controller
 %         [delta_(i), Fx_(i)] = look_ahead_controller(Ux_(i), e_(i), dpsi_(i), ...
 %                                                 kappa, gains, Ux_des, veh, ...
@@ -173,17 +173,12 @@ xlabel('Time [s]')
 ylabel('Total Longitudinal Force [Fx]')
 
 figure
-subplot(2,1,1);
+
 plot(t_, Uxerror_);
 grid on
 xlabel('Time [s]')
 ylabel('Ux error [m/s]')
 
-subplot(2,1,1);
-plot(t_, Uxerror_);
-grid on
-xlabel('Time [s]')
-ylabel('Ux error [m/s]')
 %--------------------------------------------------------------------------
 %% ANIMATE VEHICLE
 %--------------------------------------------------------------------------
