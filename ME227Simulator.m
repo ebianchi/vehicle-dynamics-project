@@ -29,7 +29,7 @@ gains.K_lat_i_PID = 0.001;    % []        more thoughtfully
 gains.K_lat_d_PID = 7;         % []
 
 % Select controller
-control_mode = 2;  % 1 - lookahead controller
+control_mode = 1;  % 1 - lookahead controller
                    % 2 - PID controller
 
 % Load path and speed profile
@@ -53,10 +53,10 @@ Fx_ = zeros(1,lenT);
 %% SET INITIAL CONDITIONS
 %--------------------------------------------------------------------------
 s_(1) = 0;
-e_(1) = 1;
+e_(1) = 0;
 dpsi_(1) = 0;
 r_(1) = 0;
-Ux_(1) = 15;
+Ux_(1) = 0;
 Uy_(1) = 0;
 
 %--------------------------------------------------------------------------
@@ -173,4 +173,4 @@ ylabel('Total Longitudinal Force [Fx]')
 %--------------------------------------------------------------------------
 %% ANIMATE VEHICLE
 %--------------------------------------------------------------------------
-% animate(path, veh, dpsi_, s_, e_, delta_)
+animate(path, veh, dpsi_, s_, e_, delta_)
