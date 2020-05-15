@@ -84,6 +84,13 @@ Ux_des = interp1(path.s, path.UxDes, s);
 kappa = interp1(path.s, path.k, s);
 
 %--------------------------------------------------------------------------
+%% Add Grade Noise
+%--------------------------------------------------------------------------
+Ux_dist_mag = 5; %set this to zero if you don't want grade disturbances!
+grade_noise = rand * Ux_dist_mag - Ux_dist_mag/2;
+Ux = Ux + grade_noise;
+%--------------------------------------------------------------------------
+
 %% Lateral Control Law
 %--------------------------------------------------------------------------
 if control_mode == 1  % lookahead controller
