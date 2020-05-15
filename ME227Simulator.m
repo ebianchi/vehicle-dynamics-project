@@ -24,12 +24,12 @@ gains.x_la = 15;                % [m]
 gains.K_long = veh.m*0.1*g;     % [N/m]
 
 % Set control gains -- PID controller
-gains.K_lat_p_PID = 0.1;           % [] TODO:  Fill in units here and tune
+gains.K_lat_p_PID = 5;           % [] TODO:  Fill in units here and tune
 gains.K_lat_i_PID = 0.001;    % []        more thoughtfully
-gains.K_lat_d_PID = 7;         % []
+gains.K_lat_d_PID = .1;         % []
 
 % Select controller
-control_mode = 1;  % 1 - lookahead controller
+control_mode = 2;  % 1 - lookahead controller
                    % 2 - PID controller
 
 % Load path and speed profile
@@ -179,11 +179,11 @@ grid on
 xlabel('Time [s]')
 ylabel('Ux error [m/s]')
 
-subplot(2,1,1);
-plot(t_, Uxerror_);
+subplot(2,1,2);
+plot(t_, Ux_);
 grid on
 xlabel('Time [s]')
-ylabel('Ux error [m/s]')
+ylabel('Ux [m/s]')
 %--------------------------------------------------------------------------
 %% ANIMATE VEHICLE
 %--------------------------------------------------------------------------
