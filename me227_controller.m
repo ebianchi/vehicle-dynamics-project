@@ -61,12 +61,14 @@ persistent int_e;
 dt = 0.005;             % Niki runs at 200Hz
 
 % Set control gains -- PID controller
-% gains.K_lat_p_PID = 0.1;           % [] TODO:  Fill in units here and tune
-% gains.K_lat_i_PID = 0.3;    % []        more thoughtfully
-% gains.K_lat_d_PID = 7;         % []
-gains.K_lat_p_PID = 3;
-gains.K_lat_i_PID = 3;
-gains.K_lat_d_PID = 0.3;
+% gains.K_lat_p_PID = 0.1;         % [] TODO:  Fill in units here and tune
+% gains.K_lat_i_PID = 0.3;         % []        more thoughtfully
+% gains.K_lat_d_PID = 7;           % []
+gains.K_lat_p_PID = 8;
+gains.K_lat_i_PID = 8;
+gains.K_lat_d_PID = 0.8;
+
+windup_thresh = 0.001;
 
 %--------------------------------------------------------------------------
 %% Control Parameters
@@ -108,8 +110,8 @@ else  % custom controller
     end
     
     % perform anti-windup
-    if abs(int_e) > 5
-        int_e = 5 * sign(int_e);
+    if abs(int_e) > windup_thresh
+        int_e = windup_thresh * sign(int_e);
     end
     
     de = Ux*sin(dpsi) + Uy*cos(dpsi);  % calculate derivative term
