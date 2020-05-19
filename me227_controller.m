@@ -58,7 +58,12 @@ K_radpmps2 = (veh.Wf / f_tire.Ca_lin - veh.Wr / r_tire.Ca_lin) / g;
 %% PID Variables
 %--------------------------------------------------------------------------
 persistent int_e;
-persistent int_Ux;
+dt = 0.005;             % Niki runs at 200Hz
+
+% Set control gains -- PID controller
+gains.K_lat_p_PID = 0.1;           % [] TODO:  Fill in units here and tune
+gains.K_lat_i_PID = 0.3;    % []        more thoughtfully
+gains.K_lat_d_PID = 7;         % []
 
 %--------------------------------------------------------------------------
 %% Control Parameters
@@ -94,9 +99,14 @@ if control_mode == 1  % lookahead controller
     
 else  % custom controller
     if isempty(int_e)                  % update integral term
-        int_e = e;
+        int_e = e*dt;
     else
-        int_e = int_e + e;
+        int_e = int_e + e*dt;
+    end
+    
+    % perform anti-windup
+    if abs(int_e) > 5
+        int_e = 5 * sign(int_e);
     end
     
     de = Ux*sin(dpsi) + Uy*cos(dpsi);  % calculate derivative term
