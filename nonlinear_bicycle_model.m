@@ -42,7 +42,9 @@ end
 %--------------------------------------------------------------------------
 %% CALCULATE VELOCITY STATE DERIVATIVES
 %--------------------------------------------------------------------------
+gradeTheta = 0; % degrees, set to 0 if no grade term
 Ux_dot = (F_xr + F_xf*cos(delta) - F_yf*sin(delta))/veh.m + r*Uy;
+Ux_dot = Ux_dot + ( 9.81 * sind(gradeTheta) );
 Uy_dot = (F_yf*cos(delta) + F_xf*sin(delta) + F_yr)/veh.m - r*Ux;
 r_dot  = (veh.a*F_yf*cos(delta) + veh.a*F_xf*sin(delta) - veh.b*F_yr)/veh.Iz;
 

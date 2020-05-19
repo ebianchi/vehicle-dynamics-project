@@ -19,9 +19,9 @@ t_ = 0:dt:30;
 lenT = length(t_);
 
 % Set control gains -- lookahead controller
-gains.K_la = 3500;              % [N/m]
-gains.x_la = 15;                % [m]
-gains.K_long = veh.m*0.1*g;     % [N/m]
+gains.K_la = 7000;              % [N/m]
+gains.x_la = 12;                % [m]
+gains.K_long = veh.m*.1*g;     % [N/m]
 
 % Set control gains -- PID controller
 gains.K_lat_p_PID = 0.1;           % [] TODO:  Fill in units here and tune
@@ -45,6 +45,7 @@ e_ = zeros(1,lenT);
 dpsi_ = zeros(1,lenT);
 r_ = zeros(1,lenT);
 Ux_ = zeros(1,lenT);
+Uxdes_long = zeros(1,lenT);
 Uy_ = zeros(1,lenT);
 delta_ = zeros(1,lenT);
 Fx_ = zeros(1,lenT);
@@ -58,7 +59,6 @@ dpsi_(1) = 0;
 r_(1) = 0;
 Ux_(1) = 0;
 Uy_(1) = 0;
-
 %--------------------------------------------------------------------------
 %% SIMULATION LOOP
 %--------------------------------------------------------------------------
@@ -70,34 +70,14 @@ for i = 1:lenT-1
     
     % look up Ux_des
     Ux_des = interp1(path.s, path.UxDes, s_(i));
+    Uxdes_long(i+1) = Ux_des;
     Uxerror_(i) = Ux_(i) - Ux_des;
+    
     % Calculate actuator commands  
     [delta_(i), Fx_(i)] = me227_controller(s_(i), e_(i), dpsi_(i), ...
                                            Ux_(i), Uy_(i), r_(i), gains,...
                                            control_mode, path);
 
-%     if control_mode == 1  % lookahead controller
-%         [delta_(i), Fx_(i)] = look_ahead_controller(Ux_(i), e_(i), dpsi_(i), ...
-%                                                 kappa, gains, Ux_des, veh, ...
-%                                                 r_tire, f_tire);
-%                                             
-%     elseif control_mode == 2  % PID controller
-%         if i == 1  % take care of initial integral and derivative terms
-%             int_Ux = 0;
-%             int_e  = 0;
-%             dUx    = 0;
-%             de     = 0;
-%         else
-%             dUx = Ux_(i) - Ux_(i-1);  % no need to also calculate integral 
-%             de  = e_(i)  - e_(i-1);   % terms, as those are added with each
-%                                       % loop
-%         end
-%         
-%         [delta_(i), Fx_(i), int_Ux, int_e] = PID_controller(Ux_(i), dUx,...
-%                                                int_Ux, e_(i), de, int_e,...
-%                                                gains, Ux_des);
-%     end
-    
     % Take simulation step
     [Ux_(i+1), Uy_(i+1), r_(i+1), s_(i+1), e_(i+1), dpsi_(i+1)] = ...
     simulate_step(Ux_(i), Uy_(i), r_(i), s_(i), e_(i), dpsi_(i), ...
@@ -178,13 +158,17 @@ plot(t_, Uxerror_);
 grid on
 xlabel('Time [s]')
 ylabel('Ux error [m/s]')
+title('Longitudinal Error, Longitudinal Speed vs Time')
 
-subplot(2,1,1);
-plot(t_, Uxerror_);
+subplot(2,1,2);
+plot(t_, Ux_)
+hold on;
+plot(t_, Uxdes_long)
+legend('Ux actual', 'Ux desired');
 grid on
 xlabel('Time [s]')
-ylabel('Ux error [m/s]')
+ylabel('Ux [m/s]')
 %--------------------------------------------------------------------------
 %% ANIMATE VEHICLE
 %--------------------------------------------------------------------------
-animate(path, veh, dpsi_, s_, e_, delta_)
+%animate(path, veh, dpsi_, s_, e_, delta_)

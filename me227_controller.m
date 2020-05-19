@@ -83,14 +83,6 @@ Ux_des = interp1(path.s, path.UxDes, s);
 % Find Curvature for the current distance along the path via interpolation
 kappa = interp1(path.s, path.k, s);
 
-%--------------------------------------------------------------------------
-%% Add Grade Noise
-%--------------------------------------------------------------------------
-Ux_dist_mag = 5; %set this to zero if you don't want grade disturbances!
-grade_noise = rand * Ux_dist_mag - Ux_dist_mag/2;
-Ux = Ux + grade_noise;
-%--------------------------------------------------------------------------
-
 %% Lateral Control Law
 %--------------------------------------------------------------------------
 if control_mode == 1  % lookahead controller
@@ -119,11 +111,11 @@ end
 %--------------------------------------------------------------------------
 %% Longitudinal Control Law
 %--------------------------------------------------------------------------
-a_des = interp1(path.s, path.axDes, s);
-rho_air = 1.225;
-Frr = veh.m * g * .015;
-Fd = .594 * rho_air * Ux^2 / 2;
-Ux_error = Ux_des - Ux;
+a_des = interp1(path.s, path.axDes, s);     % desired acceleration
+rho_air = 1.225;                            % density of air
+Frr = veh.m * g * .015;                     % Rolling Resistance Force
+Fd = .594 * rho_air * Ux^2 / 2;             % Drag Force
+Ux_error = Ux_des - Ux;                     % Proportional Error Term
 Fx = K_long * Ux_error + veh.m*a_des + Frr + Fd;
 
 end
