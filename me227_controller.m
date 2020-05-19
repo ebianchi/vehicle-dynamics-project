@@ -61,9 +61,12 @@ persistent int_e;
 dt = 0.005;             % Niki runs at 200Hz
 
 % Set control gains -- PID controller
-gains.K_lat_p_PID = 0.1;           % [] TODO:  Fill in units here and tune
-gains.K_lat_i_PID = 0.3;    % []        more thoughtfully
-gains.K_lat_d_PID = 7;         % []
+% gains.K_lat_p_PID = 0.1;           % [] TODO:  Fill in units here and tune
+% gains.K_lat_i_PID = 0.3;    % []        more thoughtfully
+% gains.K_lat_d_PID = 7;         % []
+gains.K_lat_p_PID = 3;
+gains.K_lat_i_PID = 3;
+gains.K_lat_d_PID = 0.3;
 
 %--------------------------------------------------------------------------
 %% Control Parameters
