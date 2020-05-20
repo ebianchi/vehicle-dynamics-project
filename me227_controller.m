@@ -61,9 +61,7 @@ persistent int_e;
 dt = 0.005;             % Niki runs at 200Hz
 
 % Set control gains -- PID controller
-% gains.K_lat_p_PID = 0.1;         % [] TODO:  Fill in units here and tune
-% gains.K_lat_i_PID = 0.3;         % []        more thoughtfully
-% gains.K_lat_d_PID = 7;           % []
+% TODO:  Fill in units here and tune more thoughtfully
 gains.K_lat_p_PID = 8;
 gains.K_lat_i_PID = 8;
 gains.K_lat_d_PID = 0.8;
@@ -116,6 +114,8 @@ else  % custom controller
     
     de = Ux*sin(dpsi) + Uy*cos(dpsi);  % calculate derivative term
     
+    % Note:  the negative signs are because a positive lateral error is
+    % compensated for by a negative steering angle.
     lat_i = K_lat_i * -int_e;          % calculate integral contribution
     lat_p = K_lat_p * -e;              % calculate proportional contribution
     lat_d = K_lat_d * -de;             % calculate derivative contribution
