@@ -125,6 +125,7 @@ for i = 1:lenUx
     subplot(plot_dim, plot_dim, i);
     
     bode(K_p * plant_sys * K_s, opts);
+%     bode(plant_sys, opts);
     hold on;
     grid on;
     title("Ux = " + Ux + " m/s");

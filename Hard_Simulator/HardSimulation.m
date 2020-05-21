@@ -7,7 +7,7 @@
 clear; clc; close all;
 
 % Clear persistent variables
-clear simulate_step; clear gps_model; 
+clear simulate_step; clear gps_model; clear me227_controller;
 clear brakeDynamics; clear engineDynamics; clear steeringDynamics;
 
 %--------------------------------------------------------------------------
@@ -27,9 +27,9 @@ gains.K_la = 3500; % [N/m]
 gains.x_la = 15; % [m]
 gains.K_long = 0.1*veh.m*veh.g; % [N/m/s]
 
-% Select lookahead controller mode
-% control_mode = 1; % Feedback only
-control_mode = 2; % Feedforward + Feedback
+% Controller type
+% control_mode = 1; % Lookahead controller
+control_mode = 2; % PID controller
 
 % Load path and speed profile
 load('path.mat')

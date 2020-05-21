@@ -11,12 +11,6 @@ function [ delta, Fx ] = me227_controller(s, e, dpsi, Ux, Uy, r, gains, ...
 % For the project you will use this same input output structure and in this
 % homework you will use this control structure for defining the control
 % inputs in your simulation.
-%
-% TODO FOR LOOKAHEAD: add in drag, rolling resistance to feed-forward term,
-% adjust gains appropriately.
-%
-% TODO FOR PID CONTROLLER: figure out how to calculate a derivative for the
-% velocity error.
 %--------------------------------------------------------------------------
 %% Constants
 %--------------------------------------------------------------------------
@@ -62,11 +56,37 @@ dt = 0.005;             % Niki runs at 200Hz
 
 % Set control gains -- PID controller
 % TODO:  Fill in units here and tune more thoughtfully
-gains.K_lat_p_PID = 8;
-gains.K_lat_i_PID = 8;
-gains.K_lat_d_PID = 0.8;
+gains.K_lat_p_PID = 1.2;
+gains.K_lat_i_PID = 0.8;
+gains.K_lat_d_PID = 0.3;
 
-windup_thresh = 0.001;
+windup_thresh = 0.4;  % anti-windup
+
+% n = 200;
+% persistent past_n_e_measurements;   % filter the e measurements
+% if isempty(past_n_e_measurements)
+%     past_n_e_measurements = zeros(n,1);
+%     for i = 1:n
+%         past_n_e_measurements(i) = e;
+%     end
+% end
+% 
+% m = 1;
+% persistent past_m_de_measurements;   % filter the de measurements
+% if isempty(past_m_de_measurements)
+%     past_m_de_measurements = zeros(m,1);
+%     for i = 1:m
+%         past_m_de_measurements(i) = Ux*sin(dpsi) + Uy*cos(dpsi);
+%     end
+% end
+
+% persistent last_delta;  % save last command so we can perform smoothing
+% smoothing_thresh = deg2rad(0.8);   % choose a threshold of [deg/timestep]
+
+% persistent row;
+% if isempty(row)
+%     row = 1;
+% end
 
 %--------------------------------------------------------------------------
 %% Control Parameters
@@ -91,6 +111,7 @@ Ux_des = interp1(path.s, path.UxDes, s);
 % Find Curvature for the current distance along the path via interpolation
 kappa = interp1(path.s, path.k, s);
 
+
 %% Lateral Control Law
 %--------------------------------------------------------------------------
 if control_mode == 1  % lookahead controller
@@ -101,6 +122,20 @@ if control_mode == 1  % lookahead controller
     delta = -K_la * (e + x_la*dpsi)/f_tire.Ca_lin + delta_ff;
     
 else  % custom controller
+%     % filter the e term
+%     for i = n:-1:2
+%         past_n_e_measurements(i) = past_n_e_measurements(i-1);
+%     end
+%     past_n_e_measurements(1) = e;
+%     filtered_e = sum(past_n_e_measurements)/n;
+%     
+%     % filter the de term
+%     for i = m:-1:2
+%         past_m_de_measurements(i) = past_m_de_measurements(i-1);
+%     end
+%     past_m_de_measurements(1) = Ux*sin(dpsi) + Uy*cos(dpsi);
+%     filtered_de = sum(past_m_de_measurements)/m;
+    
     if isempty(int_e)                  % update integral term
         int_e = e*dt;
     else
@@ -117,10 +152,32 @@ else  % custom controller
     % Note:  the negative signs are because a positive lateral error is
     % compensated for by a negative steering angle.
     lat_i = K_lat_i * -int_e;          % calculate integral contribution
-    lat_p = K_lat_p * -e;              % calculate proportional contribution
-    lat_d = K_lat_d * -de;             % calculate derivative contribution
+    lat_p = K_lat_p * -e;     % calculate proportional contribution
+    lat_d = K_lat_d * -de;    % calculate derivative contribution
     delta = lat_p + lat_i + lat_d;     % get control for delta
-
+    
+%     % contain the commanded steering angle within limits of steering wheel
+%     if abs(delta) > deg2rad(30)
+%         delta = deg2rad(30) * sign(delta);
+%     end
+%     
+%     % check if our new commanded steering angle is very different from the
+%     % last command
+%     if isempty(last_delta)
+%         last_delta = delta;
+%     end
+%     
+%     if abs(delta - last_delta) > smoothing_thresh
+%         delta = last_delta + (smoothing_thresh * sign(delta-last_delta));
+%     end
+% 
+%     last_delta = delta;                % save away this delta for next time
+    
+%     % Save away PID terms for exploration
+%     row_to_write = join(string(['A', string(row), ':C', string(row)]), "");
+%     writematrix([lat_p, lat_i, lat_d],'PID_terms.xls','Range',row_to_write);
+%     row = row + 1;
+%     disp(lat_p + "  " + lat_i + "  " + lat_d);
 end
 
 %--------------------------------------------------------------------------
