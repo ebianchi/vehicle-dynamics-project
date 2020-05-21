@@ -5,13 +5,13 @@
 setup_niki;
 
 % Gains and conditions
-K_la_ = 1000:1000:10000;   % [N/m]
+K_la_ = 1000:500:10000;   % [N/m]
 x_la_ = 5:1:15;           % [m]    
 Ux_ = 5:1:13;       % [m/s] %NOTE: make the number of iterable values have a round square root! (e.g 4, 9, 16)
 lenKla = length(K_la_);
 lenXla = length(x_la_);
 lenUx = length(Ux_);
-
+    
 % Allocate space for poles (We know there are 4)
 poles_ = zeros(4,lenKla);
 
@@ -77,7 +77,7 @@ for i = 1:lenXla
         end
         cmap = colormap(winter(lenKla));
         for idx = 1:lenKla
-            plot(real(poles_(:,idx)), imag(poles_(:,idx)), 'x', 'Color', cmap(idx,:))
+            plot(real(poles_(:,idx)), imag(poles_(:,idx)), '.', 'Color', cmap(idx,:))
             hold on
         end
         xline(0,'--');
