@@ -56,16 +56,16 @@ dt = 0.005;             % Niki runs at 200Hz
 
 % Set control gains -- PID controller
 % ORIGINAL GAINS:
-% gains.K_lat_p_PID = 1.2;
-% gains.K_lat_i_PID = 0.8;
-% gains.K_lat_d_PID = 0.3;
-% windup_thresh = 0.4;  % anti-windup
+gains.K_lat_p_PID = 1.2;
+gains.K_lat_i_PID = 0.8;
+gains.K_lat_d_PID = 0.3;
+windup_thresh = 0.4;  % anti-windup
 
 % LESS AGGRESSIVE GAINS
-gains.K_lat_p_PID = 0.8;
-gains.K_lat_i_PID = 0.2;
-gains.K_lat_d_PID = 0.1;
-windup_thresh = 0.75;  % anti-windup
+% gains.K_lat_p_PID = 0.8;
+% gains.K_lat_i_PID = 0.2;
+% gains.K_lat_d_PID = 0.1;
+% windup_thresh = 0.75;  % anti-windup
 
 %--------------------------------------------------------------------------
 %% Control Parameters
